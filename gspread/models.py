@@ -322,6 +322,21 @@ class Worksheet(object):
         feed = self.client.get_cells_cell_id_feed(self,
                                                   self._cell_addr(row, col))
         return Cell(self, feed)
+        
+    def range_row(self, rownum):
+        """Returns a list of :class:`Cell` objects from specified row number.
+
+        :param rownum: An integer that specifies the row number to get.
+
+        """
+        #This will use Google's R1C1 notation as documented at
+        #https://developers.google.com/google-apps/spreadsheets/
+
+        #Generate the R1C1 notation string
+        yourmom = "R" + str(rownum) + "C1:R" + str(rownum) + "C" + str(self.col_count)
+        feed = self.client.get_cells_feed(self, params={'range': yourmom,
+                                                        'return-empty': 'true'})
+        return [Cell(self, elem) for elem in feed.findall(_ns('entry'))]
 
     def range(self, alphanum):
         """Returns a list of :class:`Cell` objects from specified range.
